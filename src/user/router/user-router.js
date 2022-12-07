@@ -1,12 +1,12 @@
 import express from "express";
-import userController from "../controller/user-controller";
+import {createUser, updateProfilePic, showAllUsers} from "../controller/user-controller";
 
 const router = express.Router();
 
-router.post("/create-user", userController.createUser);
+router.post("/create-user", createUser);
 
-router.patch("/change-profile-picture", userController.updateProfilePic)
+router.patch("/change-profile-picture", updateProfilePic)
 
-router.get("/show-all-users", userController.showAllUsers)
+router.get("/show-all-users", showAllUsers)
 
 module.exports = router;

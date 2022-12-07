@@ -1,6 +1,6 @@
 import User from "../model/user-model";
 
-exports.createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
     const user = await new User({
       name: req.body.name,
@@ -25,7 +25,7 @@ exports.createUser = async (req, res) => {
   }
 };
 
-exports.updateProfilePic = async (req, res) => {
+export const updateProfilePic = async (req, res) => {
   try {
     if (req.files) {
       const filename = req.files.profile_pic.name;
@@ -52,7 +52,7 @@ exports.updateProfilePic = async (req, res) => {
   }
 };
 
-exports.showAllUsers = async (req, res) => {
+export const showAllUsers = async (req, res) => {
   try {
     const users = await User.find();
     if (users < 1) {

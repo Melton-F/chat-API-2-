@@ -1,7 +1,7 @@
 import Chat from "../model/chat-model";
 import User from "../../user/model/user-model";
 
-exports.createNewChat = async (req, res) => {
+export const createNewChat = async (req, res) => {
   try {
     const chat = await new Chat({
       sender: req.body.sender,
@@ -43,7 +43,7 @@ exports.createNewChat = async (req, res) => {
   }
 };
 
-exports.showAllChats = async (req, res) => {
+export const showAllChats = async (req, res) => {
   try {
     const chats = await Chat.find();
     res.status(200).json({
@@ -56,7 +56,7 @@ exports.showAllChats = async (req, res) => {
   }
 };
 
-exports.updateChatById = async (req, res) => {
+export const updateChatById = async (req, res) => {
   try {
     const chat = await Chat.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -69,49 +69,44 @@ exports.updateChatById = async (req, res) => {
   }
 };
 
-// exports.lastChats = async(req, res)=>{
-//     try {
-//         const userOnChats = await Chat.find({ $or: [ {sender:req.body.user }, { receiver:req.body.user } ] })
-//         if(userOnChats<0){
-//             return res.status(404).json({
-//                 message:"data not found"
-//             })
-//         }
+export const allchats = async(req, res)=>{
+    try {
+        const userOnChats = await Chat.find({ $or: [ {sender:req.body.user }, { receiver:req.body.user } ] })
+        if(userOnChats<0){
+            return res.status(404).json({
+                message:"data not found"
+            })
+        }
 
-//         userOnChats.forEach((element, index) => {
-//             console.log(element)
-//         });
+        userOnChats.forEach((element, index) => {
+            console.log(element)
+        });
 
-//         res.status(200).json({
-//             chat_count:userOnChats.length,
-//             my_chats:userOnChats
-//         })
-//     } catch (error) {
-//         res.send(error.message)
-//     }
-// }
+        res.status(200).json({
+            chat_count:userOnChats.length,
+            my_chats:userOnChats
+        })
+    } catch (error) {
+        res.send(error.message)
+    }
+}
 
-exports.userHomeChatPage = async (req, res) => {
+export const userHomeChatPage = async (req, res) => {
   try {
     const user = await User.findById(req.body.user);
-    // console.log(user.contacts);
     const friendsId = user.contacts;
     let data = [];
-    let emptyObj = {}
-    // console.log(friendsId);
     for(let i = 0; i<friendsId.length; i++){
+        let emptyObj = {}
         const friendsDetail = friendsId[i]
-        // console.log();
         const chats = await Chat.find(
             {
                 $or: [ { sender : req.body.user, receiver: friendsDetail },
                      { sender:friendsDetail, receiver: req.body.user }
                 ]
             })
-        console.log(chats);
         const lastIndex = chats.length - 1;
         const finalChats = chats[lastIndex]
-        // console.log(finalChats);
 
         if(finalChats.sender === req.body.user){
             let friend = await User.findById(finalChats.receiver)
@@ -120,7 +115,6 @@ exports.userHomeChatPage = async (req, res) => {
             emptyObj.profile_picture = friend.profile_picture
             emptyObj.message = finalChats.message
             data.push(emptyObj)
-            // console.log(emptyObj);
         }
         if(finalChats.receiver === req.body.user){
             let friend = await User.findById(finalChats.sender)
@@ -129,13 +123,12 @@ exports.userHomeChatPage = async (req, res) => {
             emptyObj.profile_picture = friend.profile_picture
             emptyObj.message = finalChats.message
             data.push(emptyObj)
-            // console.log(emptyObj);
         }
         if (data.length === friendsId.length){
-            console.log("after the loop");
-            // console.log(data);
+            res.status(200).json({
+                user_chat_home_page:data
+            })
         }
-        // console.log(arr);
     }
   } catch (error) {
     res.send(error.message);

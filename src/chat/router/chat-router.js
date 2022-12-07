@@ -1,16 +1,16 @@
 import express from "express"
 const router = express.Router()
 
-import chatController from "../controller/chat-controller"
+import {createNewChat, showAllChats, updateChatById, allchats, userHomeChatPage} from "../controller/chat-controller"
 
-router.post("/new-chat", chatController.createNewChat);
+router.post("/new-chat", createNewChat);
 
-router.get("/show-all-chats", chatController.showAllChats);
+router.get("/show-all-chats", showAllChats);
 
-router.patch("/edit-chat/:id", chatController.updateChatById);
+router.patch("/edit-chat/:id", updateChatById);
 
-// router.post("/chats-of-user", chatController.lastChats);
+router.post("/all-chats-of-user", allchats);
 
-router.post("/chat-home-page", chatController.userHomeChatPage);
+router.post("/chat-home-page", userHomeChatPage);
 
 module.exports = router
