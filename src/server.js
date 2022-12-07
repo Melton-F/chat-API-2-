@@ -4,8 +4,8 @@ import fileUpload from "express-fileupload";
 const app = express();
 
 
-import userRouter from "./user/router/userRouter"
-import chatRouter from "./chat/router/chatRouter"
+import userRouter from "./user/router/user-router"
+import chatRouter from "./chat/router/chat-router"
 
 //file upload middleware
 app.use(fileUpload());

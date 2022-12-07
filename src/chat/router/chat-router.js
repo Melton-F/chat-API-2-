@@ -1,7 +1,7 @@
 import express from "express"
 const router = express.Router()
 
-import chatController from "../controller/chatController"
+import chatController from "../controller/chat-controller"
 
 router.post("/new-chat", chatController.createNewChat);
 
