@@ -14,7 +14,7 @@ const chatSchema = new mongoose.Schema({
         type: String,
         enum: ["read", "send", "delivered"]
     }
-})
+}, {versionKey:false})
 
 const chat = mongoose.model("Chat", chatSchema)
 module.exports = chat

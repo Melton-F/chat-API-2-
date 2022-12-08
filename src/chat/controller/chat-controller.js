@@ -69,7 +69,7 @@ export const updateChatById = async (req, res) => {
   }
 };
 
-export const allchats = async(req, res)=>{
+export const userAllchats = async(req, res)=>{
     try {
         const userOnChats = await Chat.find({ $or: [ {sender:req.body.user }, { receiver:req.body.user } ] })
         if(userOnChats<0){
@@ -90,6 +90,7 @@ export const allchats = async(req, res)=>{
         res.send(error.message)
     }
 }
+
 
 export const userHomeChatPage = async (req, res) => {
   try {
@@ -114,6 +115,7 @@ export const userHomeChatPage = async (req, res) => {
             emptyObj.name = friend.name
             emptyObj.profile_picture = friend.profile_picture
             emptyObj.message = finalChats.message
+            emptyObj.message_status = finalChats.message_status
             data.push(emptyObj)
         }
         if(finalChats.receiver === req.body.user){
@@ -122,10 +124,12 @@ export const userHomeChatPage = async (req, res) => {
             emptyObj.name = friend.name
             emptyObj.profile_picture = friend.profile_picture
             emptyObj.message = finalChats.message
+            emptyObj.message_status = finalChats.message_status
             data.push(emptyObj)
         }
         if (data.length === friendsId.length){
             res.status(200).json({
+                chat_count_of_friends:data.length,
                 user_chat_home_page:data
             })
         }
@@ -134,3 +138,66 @@ export const userHomeChatPage = async (req, res) => {
     res.send(error.message);
   }
 };
+
+export const withoutContactFieldAPI = async(req, res)=>{
+    try {
+        const chatFind = await Chat.find({
+            $or: [
+                { sender:req.body.user }, { receiver:req.body.user}
+            ]
+        })
+        let friendContact = []
+        for(let i =0; i<chatFind.length; i++){
+            friendContact.push(chatFind[i].sender)
+            if(friendContact.length===chatFind.length){
+                let getUniqueContacts = [...new Set(friendContact)]
+                // console.log(getUniqueContacts);
+
+                // to remove user's id from getUniqueContacts coz it includes the user id too
+                let userContacts = getUniqueContacts.filter((id) => id !== req.body.user)
+                console.log(userContacts);
+
+                let data = [];
+                for(let i = 0; i<userContacts.length; i++){
+                    let emptyObj = {}
+                    const friendsDetail = userContacts[i]
+                    const chats = await Chat.find(
+                        {
+                            $or: [ { sender : req.body.user, receiver: friendsDetail },
+                                 { sender:friendsDetail, receiver: req.body.user }
+                            ]
+                        })
+                    const lastIndex = chats.length - 1;
+                    const finalChats = chats[lastIndex]
+            
+                    if(finalChats.sender === req.body.user){
+                        let friend = await User.findById(finalChats.receiver)
+                        emptyObj.chat_id = finalChats._id
+                        emptyObj.name = friend.name
+                        emptyObj.profile_picture = friend.profile_picture
+                        emptyObj.message = finalChats.message
+                        emptyObj.message_status = finalChats.message_status
+                        data.push(emptyObj)
+                    }
+                    if(finalChats.receiver === req.body.user){
+                        let friend = await User.findById(finalChats.sender)
+                        emptyObj.chat_id = finalChats._id
+                        emptyObj.name = friend.name
+                        emptyObj.profile_picture = friend.profile_picture
+                        emptyObj.message = finalChats.message
+                        emptyObj.message_status = finalChats.message_status
+                        data.push(emptyObj)
+                    }
+                    if (data.length === userContacts.length){
+                        res.status(200).json({
+                            chat_count_of_friends:data.length,
+                            user_chat_home_page:data
+                        })
+                    }
+                }
+            }   
+        }
+    } catch (error) {
+        res.send(error.message)
+    }
+}

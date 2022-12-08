@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     profile_picture : {
         type: String
     }
-})
+},{versionKey:false})
 
 const user = mongoose.model("User", userSchema)
 module.exports = user
